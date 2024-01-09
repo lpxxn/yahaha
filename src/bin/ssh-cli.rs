@@ -11,6 +11,8 @@ async fn main() {
     let config = thrussh::client::Config::default();
     let config = Arc::new(config);
     let sh = Client {};
+
+    
 }
 
 struct Client {}
