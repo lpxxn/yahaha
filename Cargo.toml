@@ -7,8 +7,9 @@ edition = "2021"
 
 [dependencies]
 inquire = "0.6.2"
-thrussh = "0.35.1"
+thrussh = { version = "0.35.1", features = ["openssl"] }
 thrussh-keys = "0.22.1"
 tokio = { version = "1.35.1", features = ["full"] }
 anyhow = "1.0"
 futures = "0.3.17"
+#openssl = { version = "0.10", features = ["vendored"] }
