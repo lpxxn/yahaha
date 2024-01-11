@@ -12,10 +12,11 @@ async fn main() -> Result<()> {
         println!("The current directory is {}", current_dir.display());
     }
     let pem = std::fs::read_to_string("test.pem")?;
-    let mut ssh = Session::connect(&pem, "root", "127.0.0.1:7655").await?;
+    // let mut ssh = Session::connect(&pem, "root", "127.0.0.1:7655").await?;
+    let mut ssh = Session::connect2("li", "123", "127.0.0.1:7655").await?;
     let r = ssh.call("whoami").await?;
     assert!(r.success());
-    assert_eq!(r.output(), "ubuntu\n");
+    assert_eq!(r.output(), "li\n");
     ssh.close().await?;
     Ok(())
 }
@@ -59,6 +60,22 @@ impl Session {
         let pubkey = identities.pop().unwrap();
         let (_, auth_res) = session.authenticate_future(user, pubkey, agent).await;
         let _auth_res = auth_res?;
+        Ok(Self { session })
+    }
+
+    async fn connect2(
+        user: impl Into<String>,
+        pwd: impl Into<String>,
+        addr: impl std::net::ToSocketAddrs,
+    ) -> Result<Self> {
+        let config = client::Config::default();
+        let config = Arc::new(config);
+        let sh = Client {};
+        let mut session = client::connect(config, addr, sh).await?;
+        let ok = session.authenticate_password(user, pwd).await?;
+        if !ok {
+            return Err(anyhow::anyhow!("auth failed"));
+        }
         Ok(Self { session })
     }
 
