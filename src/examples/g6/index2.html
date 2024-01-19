@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Tutorial Demo</title>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.8.21/dist/g6.min.js"></script>
+</head>
+<body>
+<div id="graph-container">AAAAAA</div>
+
+<script>
+    const data = {
+        nodes: [
+            {id: 'node1', name: 'node1', x: 100, y: 100, label: 'Node 1'},
+            {id: 'node2', name: 'node2', x: 300, y: 100, label: 'Node 2'},
+        ],
+        edges: [
+            {source: 'node1', target: 'node2', label: 'Edge 1-2'},
+        ],
+    };
+
+    // const graph = new G6.Graph({
+    //     container: 'graph-container',
+    //     width: 500,
+    //     height: 300,
+    // });
+    const graph = new G6.Graph({
+        container: "graph-container",
+        width: 500,
+        height: 500,
+        defaultNode: {
+            type: "circle",
+            size: [100],
+            color: "#5B8FF9",
+            style: {
+                fill: "#9EC9FF",
+                lineWidth: 3
+            },
+            labelCfg: {
+                style: {
+                    fill: "#fff",
+                    fontSize: 20
+                }
+            }
+        },
+        defaultEdge: {
+            style: {
+                stroke: "#e2e2e2"
+            }
+        }
+    });
+
+    graph.data(data);
+    graph.render();
+    // Add click event listener to nodes
+    graph.on('node:click', (e) => {
+        const node = e.item;
+        // Change the color of the clicked node
+        // node.set('custom:color', 'red');
+        graph.updateItem(node, {
+            // 修改默认样式
+            style: {
+                stroke: 'green',
+                // 修改 name 为 'node-label' 的子图形的默认样式
+                'node1': {
+                    stroke: 'yellow',
+                },
+                stateStyles: {
+                    stroke: 'red',
+                    // 修改 hover 状态下的样式
+                    hover: {
+                        stroke: 'red',
+                        // opacity: 0.1,
+                        opacity: 0.6,
+                        // 修改 name 为 'node2' 的子图形 hover 状态下的样式
+                        'node2': {
+                            stroke: 'red',
+                        },
+                    },
+                },
+            }
+            // https://g6.antv.antgroup.com/manual/middle/states/state#%E9%85%8D%E7%BD%AE-state-%E6%A0%B7%E5%BC%8F
+        });
+    });
+</script>
+</body>
+</html>
