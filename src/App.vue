@@ -11,6 +11,9 @@ const error = ref('')
 const query = ref('')
 const wireframe = ref(false)
 const hideWall = ref(true)
+const ambientOn = ref(true)
+const ambientIntensity = ref(1.3)
+const hemisphereIntensity = ref(0.75)
 const showTransparency = ref(0.5)
 const zoom = ref(1)
 const panX = ref(0)
@@ -25,6 +28,8 @@ let scene
 let camera
 let controls
 let helper
+let ambientLight
+let hemisphereLight
 let frameId = 0
 let homeDistance = 0
 const baseTarget = new THREE.Vector3()
@@ -101,6 +106,19 @@ function applyWallVisibility() {
 }
 
 watch(hideWall, applyWallVisibility)
+
+function applyAmbient() {
+  if (ambientLight) ambientLight.visible = ambientOn.value
+}
+
+watch(ambientOn, applyAmbient)
+
+function applyLightIntensities() {
+  if (ambientLight) ambientLight.intensity = Number(ambientIntensity.value)
+  if (hemisphereLight) hemisphereLight.intensity = Number(hemisphereIntensity.value)
+}
+
+watch([ambientIntensity, hemisphereIntensity], applyLightIntensities)
 
 function applyShowTransparency() {
   if (!model.value) return
@@ -256,11 +274,14 @@ onMounted(async () => {
   controls = new OrbitControls(camera, renderer.domElement)
   controls.enableDamping = true
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.85))
+  ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity.value)
+  ambientLight.visible = ambientOn.value
+  scene.add(ambientLight)
   const sun = new THREE.DirectionalLight(0xffffff, 1.1)
   sun.position.set(400, 700, 300)
   scene.add(sun)
-  scene.add(new THREE.HemisphereLight(0xf4f7fb, 0x8d97a3, 0.45))
+  hemisphereLight = new THREE.HemisphereLight(0xf4f7fb, 0x8d97a3, hemisphereIntensity.value)
+  scene.add(hemisphereLight)
 
   window.addEventListener('resize', onResize)
   renderer.domElement.addEventListener('pointerdown', onPointerDown)
@@ -320,6 +341,25 @@ onBeforeUnmount(() => {
         <label class="check">
           <input v-model="hideWall" type="checkbox" :disabled="!model" />
           隐藏墙
+        </label>
+        <label class="check">
+          <input v-model="ambientOn" type="checkbox" :disabled="!model" />
+          开环境光
+        </label>
+        <label class="slider">
+          <span>环境光 {{ Number(ambientIntensity).toFixed(2) }}</span>
+          <input v-model.number="ambientIntensity" type="range" min="0" max="3" step="0.01" :disabled="!model" />
+        </label>
+        <label class="slider">
+          <span>半球光 {{ Number(hemisphereIntensity).toFixed(2) }}</span>
+          <input
+            v-model.number="hemisphereIntensity"
+            type="range"
+            min="0"
+            max="3"
+            step="0.01"
+            :disabled="!model"
+          />
         </label>
         <label class="slider">
           <span>缩放 {{ Math.round(zoom * 100) }}%</span>
