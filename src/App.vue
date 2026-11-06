@@ -348,7 +348,7 @@ onBeforeUnmount(() => {
         </label>
         <label class="slider">
           <span>环境光 {{ Number(ambientIntensity).toFixed(2) }}</span>
-          <input v-model.number="ambientIntensity" type="range" min="0" max="3" step="0.01" :disabled="!model" />
+          <input v-model.number="ambientIntensity" type="range" min="0" max="20" step="0.01" :disabled="!model" />
         </label>
         <label class="slider">
           <span>半球光 {{ Number(hemisphereIntensity).toFixed(2) }}</span>
@@ -356,7 +356,7 @@ onBeforeUnmount(() => {
             v-model.number="hemisphereIntensity"
             type="range"
             min="0"
-            max="3"
+            max="20"
             step="0.01"
             :disabled="!model"
           />
